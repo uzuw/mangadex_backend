@@ -101,8 +101,99 @@ app.get('/api/languages', (req, res) => {
     
       res.json({ languages });
     });
+  
+    app.get('/api/manga/:id/chapters', async (req, res) => {
+      const { id } = req.params;
+    
+      try {
+        const response = await axios.get(`https://api.mangadex.org/manga/${id}/feed`, {
+          params: {
+            translatedLanguage: ['en'],
+            order: { readableAt: 'desc' },
+            limit: 20
+          }
+        });
+    
+        res.json(response.data);
+      } catch (error) {
+        console.error('Error fetching manga feed:', error.message);
+        res.status(500).json({ error: 'Failed to fetch manga feed' });
+      }
+    });
+    
+    app.get('/api/chapter/:id', async (req, res) => {
+      const { id } = req.params;
+    
+      try {
+        const response = await axios.get(`https://api.mangadex.org/chapter/${id}`);
+        res.json(response.data);
+      } catch (error) {
+        console.error('Error fetching chapter:', error.message);
+        res.status(500).json({ error: 'Failed to fetch chapter' });
+      }
+    });
     
 
+    app.get('/api/author/:id', async (req, res) => {
+      const { id } = req.params;
+    
+      try {
+        const response = await axios.get(`https://api.mangadex.org/author/${id}`);
+        res.json(response.data);
+      } catch (error) {
+        console.error('Error fetching author:', error.message);
+        res.status(500).json({ error: 'Failed to fetch author' });
+      }
+    });
+
+    app.get('/api/manga/:id/cover', async (req, res) => {
+      const { id } = req.params;
+    
+      try {
+        const response = await axios.get(`https://api.mangadex.org/cover`, {
+          params: {
+            manga: id,
+            limit: 1,
+            order: { createdAt: 'desc' }
+          }
+        });
+    
+        const coverFileName = response.data.data[0]?.attributes?.fileName;
+    
+        if (!coverFileName) {
+          return res.status(404).json({ error: 'Cover not found' });
+        }
+    
+        const coverUrl = `https://uploads.mangadex.org/covers/${id}/${coverFileName}`;
+        res.json({ coverUrl });
+      } catch (error) {
+        console.error('Error fetching cover:', error.message);
+        res.status(500).json({ error: 'Failed to fetch cover' });
+      }
+    });
+     
+    app.get('/api/genre/:tagId', async (req, res) => {
+      const { tagId } = req.params;
+    
+      try {
+        const response = await axios.get('https://api.mangadex.org/manga', {
+          params: {
+            includedTags: [tagId],
+            availableTranslatedLanguage: ['en'],
+            limit: 10,
+            order: {
+              relevance: 'desc'
+            }
+          }
+        });
+    
+        res.json(response.data);
+      } catch (error) {
+        console.error('Error fetching manga by genre:', error.message);
+        res.status(500).json({ error: 'Failed to fetch manga by genre' });
+      }
+    });
+    
 app.listen(PORT,()=>{
 console.log(`server is now running in https://localhost:${PORT}`);
 })
