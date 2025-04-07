@@ -193,6 +193,20 @@ app.get('/api/languages', (req, res) => {
         res.status(500).json({ error: 'Failed to fetch manga by genre' });
       }
     });
+
+    //to make easir for the frontend
+    app.get('/api/genres', (req, res) => {
+      const genres = [
+        { name: 'Action', id: '391b0423-d847-456f-aff0-8b0cfc03066b' },
+        { name: 'Romance', id: '423e2eae-a7a2-4a8b-ac03-a8351462d71d' },
+        { name: 'Comedy', id: '4d32cc48-9f00-4cca-9ccc-3fc2ada36143' },
+        { name: 'Drama', id: 'cd1f8e67-1f93-4d09-bb6e-d6b3cabd2d5b' },
+        { name: 'Fantasy', id: 'cdc58593-87dd-415e-bbc0-2ec27bf404cc' },
+        { name: 'Sci-Fi', id: '256c8bd9-4904-4360-bf4f-508a76d67183' }
+      ];
+      res.json({ genres });
+    });
+    
     
 app.listen(PORT,()=>{
 console.log(`server is now running in https://localhost:${PORT}`);
